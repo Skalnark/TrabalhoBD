@@ -1,0 +1,74 @@
+@startuml Banco de Usuários
+
+entity Usuario {
+    Id
+    --
+    Nome
+    Email
+    Senha
+    TipoDeConta
+}
+
+entity Post {
+    Id
+    --
+    IdUsuario
+    IdOnibus
+    IdMensagem
+}
+
+entity Mensagem{
+    Id
+    --
+    IdPost
+    Data
+    Texto
+}
+
+entity Onibus {
+    Id
+    --
+    NumeroDaLinha
+    HorarioDePartida
+    Passageiros
+}
+
+entity Linha {
+    Id
+    --
+    CodigoDaLinha
+}
+
+entity Ponto {
+    Id
+    --
+    Rua
+    Bairro
+    Referencia
+}
+
+entity PontoLinha {
+    Id
+    --
+    IdPonto
+    IdLinha
+}
+
+entity LinhaOnibus {
+    Id
+    --
+    IdOnibus
+    IdLinha
+}
+
+Onibus --{ LinhaOnibus : 1:n
+LinhaOnibus }-- Linha : 1:n
+Linha --{ PontoLinha : 1:n
+Ponto --{ PontoLinha : 1:n
+
+Post }-- Usuario : 1:n
+Post }-- Onibus : 1:n
+Post --{ Mensagem : 1:n
+
+
+@enduml
