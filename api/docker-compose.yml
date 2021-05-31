@@ -17,15 +17,17 @@ services:
       - SERVER_DB_NAME=postgres
     networks:
       - net
+    volumes:
+      - dbapi:/usr/app
   
   db:
     image: postgres:13
     restart: always
     volumes:
-      - db:/var/lib/postgresql/data
-      - ./sql/initialize.sql:/docker-entrypoint-initdb.d/init.sql
+      - dbapi:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports: 
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - net
     environment:
@@ -35,7 +37,7 @@ services:
 
 
 volumes:
-  db:
+  dbapi:
 
 networks:
   net:
