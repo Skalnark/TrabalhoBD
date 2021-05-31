@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  api:
+    build: src/
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment: 
+      - SERVER_PORT=3000
+      - SERVER_HOST=0.0.0.0
+      - SERVER_DB_HOST=db
+      - SERVER_DB_PORT=5432
+      - SERVER_DB_USER=postgres
+      - SERVER_DB_PASSWORD=password
+      - SERVER_DB_NAME=postgres
+    networks:
+      - net
+  
+  db:
+    image: postgres:13
+    restart: always
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./sql/initialize.sql:/docker-entrypoint-initdb.d/init.sql
+    ports: 
+      - "5432:5432"
+    networks:
+      - net
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+
+
+
+volumes:
+  db:
+
+networks:
+  net:
