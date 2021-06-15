@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"os"
+
+	"./models"
 	"github.com/jmoiron/sqlx"
 
-	_ "github.com/lib/pq" 
+	_ "github.com/lib/pq"
 )
 
 //DB armazena a conexão com o banco de dados
@@ -47,15 +49,21 @@ func main() {
 	defer DB.Close()
 }
 
-
 func HTTPServer(host string, port string) {
 
 	http.HandleFunc("/", Root)
+	http.HandleFunc("/Teste", Teste)
+
 	l := host + ":" + port
 
 	fmt.Println("\n\nIniciando servidor em ", l)
 
 	fmt.Println(http.ListenAndServe(l, nil))
+}
+
+func Teste(w http.ResponseWriter, r *http.Request) {
+	var test = models.Usuario{Nome: "teste"}
+	fmt.Fprintf(w, test.Nome)
 }
 
 func Root(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +77,7 @@ func OpenConnection(host string, port int, user string, password string, dbname 
 			"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-    fmt.Println(SQLInfo)
+	fmt.Println(SQLInfo)
 
 	db, err = sqlx.Open("postgres", SQLInfo)
 
