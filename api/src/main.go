@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
 	"os"
 
-	"./models"
 	"github.com/jmoiron/sqlx"
 
 	_ "github.com/lib/pq"
@@ -23,17 +21,16 @@ func main() {
 	port := os.Getenv("SERVER_PORT")
 	host := os.Getenv("SERVER_HOST")
 
-	dbhost := os.Getenv("SERVER_DB_HOST")
-	dbport := os.Getenv("SERVER_DB_PORT")
-	user := os.Getenv("SERVER_DB_USER")
-	password := os.Getenv("SERVER_DB_PASSWORD")
-	dbname := os.Getenv("SERVER_DB_NAME")
-
-	dh, _ := strconv.Atoi(dbport)
+	var dbinfo = DbInfo{
+		Host: os.Getenv("SERVER_DB_HOST"),
+		Port: os.Getenv("SERVER_DB_PORT"),
+		Username: os.Getenv("SERVER_DB_USER"),
+		Password: os.Getenv("SERVER_DB_PASSWORD"),
+		Name: os.Getenv("SERVER_DB_NAME")}
 
 	var err error
 
-	DB, err = OpenConnection(dbhost, dh, user, password, dbname)
+	DB, err = OpenConnection(dbinfo)
 
 	if err != nil {
 		fmt.Println(
@@ -62,7 +59,7 @@ func HTTPServer(host string, port string) {
 }
 
 func Teste(w http.ResponseWriter, r *http.Request) {
-	var test = models.Usuario{Nome: "teste"}
+	var test = Usuario{Nome: "teste"}
 	fmt.Fprintf(w, test.Nome)
 }
 
@@ -70,30 +67,33 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Haro warudo")
 }
 
-func OpenConnection(host string, port int, user string, password string, dbname string) (db *sqlx.DB, err error) {
+func OpenConnection(info DbInfo) (db *sqlx.DB, err error) {
 
+	var port = 0
+
+	port, err = strconv.Atoi(info.Port)
 	var SQLInfo = fmt.Sprintf(
 		"host=%s port=%d user=%s "+
 			"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+		info.Host, port, info.Username, info.Password, info.Name)
 
 	fmt.Println(SQLInfo)
 
 	db, err = sqlx.Open("postgres", SQLInfo)
 
 	if err != nil {
-		fmt.Println("(", dbname, ") erro ao conectar ao servidor")
+		fmt.Println("(", info.Name, ") erro ao conectar ao servidor")
 		return
 	}
 
 	err = db.Ping()
 
 	if err != nil {
-		fmt.Println("(", dbname, ") Erro ao pingar")
+		fmt.Println("(", info.Name, ") Erro ao pingar")
 		return
 	}
 
-	fmt.Println("Conectado ao bd: ", dbname)
+	fmt.Println("Conectado ao bd: ", info.Name)
 
 	return
 }

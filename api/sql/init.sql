@@ -26,6 +26,8 @@ CREATE TABLE post(
 CREATE TABLE mensagem(
     id_mensagem SERIAL UNIQUE PRIMARY KEY,
     id_post INT NOT NULL REFERENCES post (id_post) ON DELETE CASCADE,
+    id_usuario INT NOT NULL REFERENCES usuario (id_usuario),
+    id_mensagem_mae INT NOT NULL REFERENCES mensagem (id_mensagem),
     data DATE,
     texto VARCHAR(200)
 );

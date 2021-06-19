@@ -1,4 +1,2 @@
-#!/bin/sh
-
+#!/bin/bash
 docker-compose up --build ; docker-compose down && docker volume rm api_dbapi
-
