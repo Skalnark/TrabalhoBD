@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"os"
+    "io/ioutil"
 
 	"github.com/jmoiron/sqlx"
 
@@ -28,21 +29,29 @@ func main() {
 		Password: os.Getenv("SERVER_DB_PASSWORD"),
 		Name: os.Getenv("SERVER_DB_NAME")}
 
-	var err error
+	rawSqlData, err := ioutil.ReadFile("./sql/schedule_by_stop.sql")
+	
+	if err != nil {
+		fmt.Println("Error reading file schedule_by_stop.sql: ", err)
+		return
+	}
+
+	scheduleByStopSQL := string(rawSqlData)
+
+	fmt.Println(scheduleByStopSQL)
 
 	DB, err = OpenConnection(dbinfo)
 
 	if err != nil {
 		fmt.Println(
-			"Parando a carga do servidor. Erro ao abrir banco de dados: ",
+			"Stopping the server: error connecting to the databse",
 			err)
-
 		return
 	}
 
 	HTTPServer(host, port)
 
-	fmt.Printf("Programa finalizado\n")
+	fmt.Printf("Exiting...\n")
 	defer DB.Close()
 }
 
@@ -82,18 +91,18 @@ func OpenConnection(info DbInfo) (db *sqlx.DB, err error) {
 	db, err = sqlx.Open("postgres", SQLInfo)
 
 	if err != nil {
-		fmt.Println("(", info.Name, ") erro ao conectar ao servidor")
+		fmt.Println("(", info.Name, ") error connecting to the server")
 		return
 	}
 
 	err = db.Ping()
 
 	if err != nil {
-		fmt.Println("(", info.Name, ") Erro ao pingar")
+		fmt.Println("(", info.Name, ") ping error")
 		return
 	}
 
-	fmt.Println("Conectado ao bd: ", info.Name)
+	fmt.Println("Conected to the database: ", info.Name)
 
 	return
 }
