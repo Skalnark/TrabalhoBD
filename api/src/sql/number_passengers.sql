@@ -1,1 +1,1 @@
-SELECT passenger FROM bus WHERE bus_id=$1;
+SELECT passenger_count FROM bus WHERE (id_bus) = ($1);

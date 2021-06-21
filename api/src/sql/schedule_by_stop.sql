@@ -1,1 +1,1 @@
-SELECT last_seen FROM bus_stop_bus WHERE (id_bus, id_bus_stop) = ($1, $2);
+SELECT last_seen FROM station_bus WHERE (id_bus, id_station) = ($1, $2);

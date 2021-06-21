@@ -16,34 +16,34 @@ func Format(response interface{}) string {
 }
 
 type Usuario struct {
-  Username  string `json:"username" db:"username"`
-  Email string `json:"email", db:"email"`
+  Username string `json:"username" db:"username"`
+  Email    string `json:"email", db:"email"`
 }
 
 type LineBus struct {
-  Id string `json:"id" db:"id_line_bus"`
+  Id     string `json:"id" db:"id_line_bus"`
   IdLine string `json:"id_line" db:"id_line"`
-  IdBus string `json:"is_bus" db:"id_bus"`
+  IdBus  string `json:"id_bus" db:"id_bus"`
 }
 
 type Bus struct {
-  Id string `json:"id_bus" db:"id_bus`
-  LineNumber string `json:"line_number" db:"line_number"`
+  IdBus         string `json:"id_bus" db:"id_bus`
+  LineNumber    string `json:"line_number" db:"line_number"`
   DepartureTime string `json:"departure_time" db:"departure_time"`
-  Passengers int `json:"passengers", db:"passengers"`
+  PassengerCount    string `json:"passenger_count", db:"passenger_count"`
 }
 
 type StationBus struct {
-  Id string `json:"id" db:"id_station_bus"`
-  IdBus string `json:"id_bus" db:"id_bus"`
+  Id        string `json:"id" db:"id_station_bus"`
+  IdBus     string `json:"id_bus" db:"id_bus"`
   IdStation string `json:"id_station" db:"id_station"`
-  LastSeen string `json:"last_seen" db:"last_seen"`
+  LastSeen  string `json:"last_seen" db:"last_seen"`
 }
 
 type DbInfo struct {
   Username string
   Password string
-  Name string
-  Port string 
-  Host string
+  Name     string
+  Port     string 
+  Host     string
 }

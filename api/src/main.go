@@ -46,6 +46,8 @@ func HTTPServer(host string, port string) {
 
   http.HandleFunc("/", Root)
   http.HandleFunc("/GetBusScheduling", GetBusScheduling)
+  http.HandleFunc("/GetPassengers", GetPassengers)
+  http.HandleFunc("/GetAverageTime", GetAverageTime)
 
   l := host + ":" + port
 
@@ -54,36 +56,116 @@ func HTTPServer(host string, port string) {
   fmt.Println(http.ListenAndServe(l, nil))
 }
 
-func GetPassagengers(w http.ResponseWriter, r *http.Request) {
+func GetAverageTime(w http.ResponseWriter, r *http.Request) {
 
-  passengerParameter := r.URL.Query().Get("bus")
-
-  rawSqlData, err := ioutil.ReadFile("./sql/number_passengers.sql")
+  strBusParameter := r.URL.Query().Get("id_bus")
+  busParameter, err := strconv.Atoi(strBusParameter)
 
   if err != nil {
-    fmt.Println("Error readinf file number_passengers.sql", err);
+    fmt.Println("Error parsing id_bus: ", err)
     return
   }
 
-  numberOfPassengersSQL := string(rawSqlData)
-
-  row, err := DB.Queryx(numberOfPassengersSQL, passengerParameter);
+  strStationParameter := r.URL.Query().Get("id_station")
+  stationParameter, err := strconv.Atoi(strStationParameter)
 
   if err != nil {
-    fmt.Println("Error running number_passengerssql", err)
+    fmt.Println("Error parsing id_station: ", err)
     return
   }
 
-  var bus Bus
+  rawSqlData, err := ioutil.ReadFile("./sql/bus_departure.sql")
 
-  for rows.Next() {
-    err = rows.StructScan(&bus)
+  if err != nil {
+    fmt.Println("Error reading file bus_departure.sql", err);
+    return
   }
+
+  sql := string(rawSqlData)
+
+  rows, err := DB.Queryx(sql, busParameter)
+
+  if err != nil {
+    fmt.Println("Error running bus_departure_sql", err)
+    return
+  }
+
+  var bus Bus 
+
+	for rows.Next() {
+		err = rows.StructScan(&bus)
+	}
 
   if err != nil {
     fmt.Println("Error unmarshaling the rows: ", err)
     return
   }
+  
+  rawSqlData, err = ioutil.ReadFile("./sql/schedule_by_stop.sql")
+
+  if err != nil {
+	  fmt.Println("Error reading file schedule_by_stop.sql: ", err)
+	  return
+	}
+	
+	sql = string(rawSqlData)
+	
+	rows, err = DB.Queryx(sql, busParameter, stationParameter)
+	
+	if err != nil {
+		fmt.Println("Error running schedule_by_stop.sql: ", err)
+		return  
+	}
+	
+  var station StationBus
+
+	for rows.Next() {
+		err = rows.StructScan(&station)
+	}
+	
+	if err != nil {
+		fmt.Println("Error reading the schedule response", err)
+		return
+	}
+
+  var response = `{"last_seen": "`+station.LastSeen+`", "departure_time": "`+bus.DepartureTime+`"}"`
+
+  fmt.Fprintf(w, response)
+}
+
+func GetPassengers(w http.ResponseWriter, r *http.Request) {
+
+  busParameter := r.URL.Query().Get("bus")
+
+  rawSqlData, err := ioutil.ReadFile("./sql/number_passengers.sql")
+
+  if err != nil {
+    fmt.Println("Error reading file number_passengers.sql", err);
+    return
+  }
+
+  sql := string(rawSqlData)
+
+  rows, err := DB.Queryx(sql, busParameter)
+
+  if err != nil {
+    fmt.Println("Error running number_passengers.sql", err)
+    return
+  }
+
+  var passenger_count string 
+
+	for rows.Next() {
+		err = rows.Scan(&passenger_count)
+	}
+
+  if err != nil {
+    fmt.Println("Error unmarshaling the rows: ", err)
+    return
+  }
+
+  var bus Bus
+  bus.PassengerCount = passenger_count
 
   fmt.Fprintf(w, Format(bus))
 }
@@ -108,8 +190,10 @@ func GetBusScheduling(w http.ResponseWriter, r *http.Request) {
 		return  
 	}
 	
+  var station StationBus
+
 	for rows.Next() {
-		err = rows.StructScan(&lineBus)
+		err = rows.StructScan(&station)
 	}
 	
 	if err != nil {
@@ -117,7 +201,7 @@ func GetBusScheduling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-  fmt.Fprintf(w, Format(lineBus));
+  fmt.Fprintf(w, Format(station))
 }
 
 func Root(w http.ResponseWriter, r *http.Request) {

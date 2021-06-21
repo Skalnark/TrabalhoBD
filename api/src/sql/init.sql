@@ -14,7 +14,7 @@ CREATE TABLE bus(
     id_bus SERIAL UNIQUE PRIMARY KEY,
     line_number VARCHAR(10),
     departure_time DATE,
-    passengers INT
+    passenger_count INT NOT NULL
 );
 
 CREATE TABLE post(
@@ -62,7 +62,8 @@ CREATE TABLE station_line (
     id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE
 );
 
-INSERT INTO bus(line_number, departure_time, passengers) VALUES (0, '2021-01-01 12:00', 60);
+INSERT INTO bus(line_number, departure_time, passenger_count) VALUES (0, '2021-01-01 12:00', 60);
 INSERT INTO line(code) VALUES ('1500');
 INSERT INTO line_bus(id_bus, id_line, schedule) VALUES(1, 1, '2021-01-01 12:30');
 INSERT INTO station(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
+INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (1, 1, '2021-01-01 14:00');
