@@ -1,0 +1,1 @@
+SELECT schedule FROM line_bus WHERE (id_bus, id_line) = ($1, $2);

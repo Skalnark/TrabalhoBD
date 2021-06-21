@@ -1,57 +1,61 @@
-DROP TABLE IF EXISTS usuario, post, mensagem, onibus, linha_onibus, linha, ponto, ponto_linha;
+DROP TABLE IF EXISTS passenger, post, comment, bus, line_bus, line, bus_stop, bus_stop_line;
 
-CREATE TABLE usuario(
-  id_usuario SERIAL UNIQUE PRIMARY KEY,
+CREATE TABLE passenger(
+  id_passenger SERIAL UNIQUE PRIMARY KEY,
   nome VARCHAR(60),
   email VARCHAR(60),
-  senha VARCHAR(60),
-  tipo_de_conta VARCHAR(10),
-  escolaridade VARCHAR(24) NOT NULL
+  password VARCHAR(60),
+  role_type VARCHAR(10),
+  scholarity VARCHAR(24) NOT NULL
 );
 
 
-CREATE TABLE onibus(
-    id_onibus SERIAL UNIQUE PRIMARY KEY,
-    numero_da_linha VARCHAR(10),
-    horario_de_partida DATE,
-    passageiros VARCHAR(1)
+CREATE TABLE bus(
+    id_bus SERIAL UNIQUE PRIMARY KEY,
+    line_number VARCHAR(10),
+    departure_time DATE,
+    passengers INT
 );
 
 CREATE TABLE post(
     id_post SERIAL UNIQUE PRIMARY KEY,
-    id_usuario INT NOT NULL REFERENCES usuario (id_usuario),
-    id_onibus INT NOT NULL REFERENCES onibus (id_onibus)
+    id_bus INT NOT NULL REFERENCES bus (id_bus)
 );
 
-CREATE TABLE mensagem(
-    id_mensagem SERIAL UNIQUE PRIMARY KEY,
+CREATE TABLE comment(
+    id_comment SERIAL UNIQUE PRIMARY KEY,
     id_post INT NOT NULL REFERENCES post (id_post) ON DELETE CASCADE,
-    id_usuario INT NOT NULL REFERENCES usuario (id_usuario),
-    id_mensagem_mae INT NOT NULL REFERENCES mensagem (id_mensagem),
-    data DATE,
-    texto VARCHAR(200)
+    id_passenger INT NOT NULL REFERENCES passenger (id_passenger),
+    created_at DATE,
+    content VARCHAR(200)
 );
 
-CREATE TABLE linha (
-    id_linha SERIAL UNIQUE PRIMARY KEY,
-    codigo VARCHAR(20)
+CREATE TABLE line (
+    id_line SERIAL UNIQUE PRIMARY KEY,
+    code VARCHAR(20)
 );
 
-CREATE TABLE linha_onibus (
-    id_linha_onibus SERIAL UNIQUE PRIMARY KEY,
-    id_onibus INT NOT NULL REFERENCES onibus (id_onibus) ON DELETE CASCADE,
-    id_linha INT NOT NULL REFERENCES linha (id_linha) ON DELETE CASCADE
+CREATE TABLE line_bus (
+    id_line_bus SERIAL UNIQUE PRIMARY KEY,
+    id_bus INT NOT NULL REFERENCES bus (id_bus) ON DELETE CASCADE,
+    id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE,
+    schedule DATE
 );
 
-CREATE TABLE ponto (
-    id_ponto SERIAL UNIQUE PRIMARY KEY,
-    rua VARCHAR(31),
-    bairro VARCHAR(31),
-    referencia VARCHAR(31)
+CREATE TABLE bus_stop (
+    id_bus_stop SERIAL UNIQUE PRIMARY KEY,
+    street VARCHAR(31),
+    district VARCHAR(31),
+    reference VARCHAR(31)
 );
 
-CREATE TABLE ponto_linha (
-    id_ponto_linha SERIAL UNIQUE PRIMARY KEY,
-    id_ponto INT NOT NULL REFERENCES ponto (id_ponto) ON DELETE CASCADE,
-    id_linha INT NOT NULL REFERENCES linha (id_linha) ON DELETE CASCADE
+CREATE TABLE bus_stop_line (
+    id_bus_stop_line SERIAL UNIQUE PRIMARY KEY,
+    id_bus_stop INT NOT NULL REFERENCES bus_stop (id_bus_stop) ON DELETE CASCADE,
+    id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE
 );
+
+INSERT INTO bus(line_number, departure_time, passengers) VALUES (0, '2021-01-01 12:00', 60);
+INSERT INTO line(code) VALUES ('1500');
+INSERT INTO line_bus(id_bus, id_line, schedule) VALUES(1, 1, '2021-01-01 12:30');
+INSERT INTO bus_stop(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
