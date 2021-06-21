@@ -54,6 +54,40 @@ func HTTPServer(host string, port string) {
   fmt.Println(http.ListenAndServe(l, nil))
 }
 
+func GetPassagengers(w http.ResponseWriter, r *http.Request) {
+
+  passengerParameter := r.URL.Query().Get("bus")
+
+  rawSqlData, err := ioutil.ReadFile("./sql/number_passengers.sql")
+
+  if err != nil {
+    fmt.Println("Error readinf file number_passengers.sql", err);
+    return
+  }
+
+  numberOfPassengersSQL := string(rawSqlData)
+
+  row, err := DB.Queryx(numberOfPassengersSQL, passengerParameter);
+
+  if err != nil {
+    fmt.Println("Error running number_passengerssql", err)
+    return
+  }
+
+  var bus Bus
+
+  for rows.Next() {
+    err = rows.StructScan(&bus)
+  }
+
+  if err != nil {
+    fmt.Println("Error unmarshaling the rows: ", err)
+    return
+  }
+
+  fmt.Fprintf(w, Format(bus))
+}
+
 func GetBusScheduling(w http.ResponseWriter, r *http.Request) {
 
   lineBus := LineBus{IdBus: r.URL.Query().Get("bus"), IdLine: r.URL.Query().Get("line")}

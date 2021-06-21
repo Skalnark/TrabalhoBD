@@ -1,0 +1,1 @@
+SELECT passenger FROM bus WHERE bus_id=$1;

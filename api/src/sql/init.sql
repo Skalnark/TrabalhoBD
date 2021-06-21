@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS passenger, post, comment, bus, line_bus, line, bus_stop, bus_stop_line;
+DROP TABLE IF EXISTS passenger, post, comment, bus, line_bus, line, station, station_line;
 
 CREATE TABLE passenger(
   id_passenger SERIAL UNIQUE PRIMARY KEY,
@@ -42,20 +42,27 @@ CREATE TABLE line_bus (
     schedule DATE
 );
 
-CREATE TABLE bus_stop (
-    id_bus_stop SERIAL UNIQUE PRIMARY KEY,
+CREATE TABLE station (
+    id_station SERIAL UNIQUE PRIMARY KEY,
     street VARCHAR(31),
     district VARCHAR(31),
     reference VARCHAR(31)
 );
 
-CREATE TABLE bus_stop_line (
-    id_bus_stop_line SERIAL UNIQUE PRIMARY KEY,
-    id_bus_stop INT NOT NULL REFERENCES bus_stop (id_bus_stop) ON DELETE CASCADE,
+CREATE TABLE station_bus (
+    id_station_bus SERIAL UNIQUE PRIMARY KEY,
+    id_bus INT NOT NULL REFERENCES bus (id_bus) ON DELETE CASCADE,
+    id_station INT NOT NULL REFERENCES station (id_station) ON DELETE CASCADE,
+    last_seen DATE
+);
+
+CREATE TABLE station_line (
+    id_station_line SERIAL UNIQUE PRIMARY KEY,
+    id_station INT NOT NULL REFERENCES station (id_station) ON DELETE CASCADE,
     id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE
 );
 
 INSERT INTO bus(line_number, departure_time, passengers) VALUES (0, '2021-01-01 12:00', 60);
 INSERT INTO line(code) VALUES ('1500');
 INSERT INTO line_bus(id_bus, id_line, schedule) VALUES(1, 1, '2021-01-01 12:30');
-INSERT INTO bus_stop(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
+INSERT INTO station(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
