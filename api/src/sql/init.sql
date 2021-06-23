@@ -9,10 +9,13 @@ CREATE TABLE passenger(
   scholarity VARCHAR(24) NOT NULL
 );
 
+CREATE TABLE line (
+    code INT PRIMARY KEY
+);
 
 CREATE TABLE bus(
     id_bus SERIAL UNIQUE PRIMARY KEY,
-    line_number VARCHAR(10),
+    line_code INT REFERENCES line (code),
     departure_time TIME NOT NULL,
     passenger_count INT NOT NULL
 );
@@ -28,17 +31,6 @@ CREATE TABLE comment(
     id_passenger INT NOT NULL REFERENCES passenger (id_passenger),
     created_at DATE NOT NULL,
     content VARCHAR(200)
-);
-
-CREATE TABLE line (
-    id_line SERIAL UNIQUE PRIMARY KEY,
-    code VARCHAR(20)
-);
-
-CREATE TABLE line_bus (
-    id_line_bus SERIAL UNIQUE PRIMARY KEY,
-    id_bus INT NOT NULL REFERENCES bus (id_bus) ON DELETE CASCADE,
-    id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE
 );
 
 CREATE TABLE station (
@@ -58,11 +50,19 @@ CREATE TABLE station_bus (
 CREATE TABLE station_line (
     id_station_line SERIAL UNIQUE PRIMARY KEY,
     id_station INT NOT NULL REFERENCES station (id_station) ON DELETE CASCADE,
-    id_line INT NOT NULL REFERENCES line (id_line) ON DELETE CASCADE
+    line_code INT NOT NULL REFERENCES line (code) ON DELETE CASCADE
 );
 
-INSERT INTO bus(line_number, departure_time, passenger_count) VALUES (0, '12:00:00', 60);
-INSERT INTO line(code) VALUES ('1500');
-INSERT INTO line_bus(id_bus, id_line) VALUES(1, 1);
+INSERT INTO line(code) VALUES (2303);
+INSERT INTO line(code) VALUES (2307);
+INSERT INTO line(code) VALUES (3203);
+INSERT INTO line(code) VALUES (3207);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (2303, '7:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (2307, '8:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (3203, '12:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (3207, '00:32:00', 30);
 INSERT INTO station(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (1, 1, '14:30:00');
+INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (2, 1, '9:20:00');
+INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (3, 1, '16:10:00');
+INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (4, 1, '23:50:00');

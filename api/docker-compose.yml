@@ -19,6 +19,7 @@ services:
       - net
     volumes:
       - dbapi:/usr/app
+      - /etc/localtime:/etc/localtime:ro
   
   db:
     image: postgres:13
@@ -26,6 +27,7 @@ services:
     volumes:
       - dbapi:/var/lib/postgresql/data
       - ./src/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - /etc/localtime:/etc/localtime:ro
     ports: 
       - "5433:5432"
     networks:
