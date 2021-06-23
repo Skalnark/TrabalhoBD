@@ -143,9 +143,12 @@ func GetAverageTime(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  fmt.Println(ls.String() + "    " + dt.String())
+  dth, dtm, _ := dt.Clock()
+  lsh, lsm, _ := ls.Clock()
 
-  var response = `{"last_seen": "`+station.LastSeen+`", "departure_time": "`+bus.DepartureTime+`"}"`
+  var response = `{
+   "last_seen": "`+strconv.Itoa(lsh) + ":" + strconv.Itoa(lsm)+`",
+   "departure_time": "`+strconv.Itoa(dth)+ ":" + strconv.Itoa(dtm)+`"}`
 
   fmt.Fprintf(w, response)
 }
