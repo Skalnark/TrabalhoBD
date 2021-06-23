@@ -6,6 +6,7 @@ import (
   "strconv"
   "os"
   "io/ioutil"
+  "time"
   
   "github.com/jmoiron/sqlx"
 
@@ -15,7 +16,7 @@ import (
 //DB armazena a conexão com o banco de dados
 var DB *sqlx.DB
 
-var timeLayout = "2006-01-02"
+var timeLayout = "2006-01-02 23:00:00 +0000 UTC"
 
 func main() {
 
@@ -127,6 +128,22 @@ func GetAverageTime(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error reading the schedule response", err)
 		return
 	}
+
+  ls, err := time.Parse(time.RFC3339, station.LastSeen)
+
+  if err != nil{
+    fmt.Println("Error parsing Station.LastSeen: ", err)
+    return
+  }
+
+  dt, err := time.Parse(time.RFC3339, bus.DepartureTime)
+
+  if err != nil {
+    fmt.Println("Error parsing bus.DepartureTime: ", err)
+    return
+  }
+
+  fmt.Println(ls.String() + "    " + dt.String())
 
   var response = `{"last_seen": "`+station.LastSeen+`", "departure_time": "`+bus.DepartureTime+`"}"`
 
