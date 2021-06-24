@@ -85,10 +85,10 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rawSqlData, err := ioutil.ReadFile("passenger_exists.sql")
+	rawSqlData, err := ioutil.ReadFile("./sql/passenger_exists.sql")
 
 	if err != nil {
-		fmt.Println("Error parsing passenger_exists.sql")
+		fmt.Println("Error parsing passenger_exists.sql: ", err)
 		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
 		return
 	}
@@ -112,17 +112,17 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rawSqlData, err = ioutil.ReadFile("new_user.sql")
+	rawSqlData, err = ioutil.ReadFile("./sql/new_user.sql")
 
 	if err != nil {
-		fmt.Println("Error reading file new_user.sql")
+		fmt.Println("Error reading file new_user.sql: ", err)
 		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
 		return
 	}
 
 	sql = string(rawSqlData)
 
-	_, err = DB.Exec(sql, passenger)
+	_, err = DB.Exec(sql, passenger.Username, passenger.Password, passenger.Email)
 
 	if err != nil {
 		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
@@ -130,10 +130,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "User created")
-}
-
-func Login(w http.ResponseWriter, r *http.Request) {
-
 }
 
 func GetArrivalTime(w http.ResponseWriter, r *http.Request) {
