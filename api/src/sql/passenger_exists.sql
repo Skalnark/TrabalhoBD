@@ -1,0 +1,1 @@
+SELECT username, email FROM passenger WHERE username = $1 OR email = $2;

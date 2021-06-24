@@ -1,0 +1,1 @@
+SELECT username, password FROM passenger p WHERE p.username = $1 AND p.password = $2;

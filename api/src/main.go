@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -15,12 +18,13 @@ import (
 
 //DB armazena a conexão com o banco de dados
 var DB *sqlx.DB
+var key string
 
 func main() {
 
 	port := os.Getenv("SERVER_PORT")
 	host := os.Getenv("SERVER_HOST")
-
+	key = os.Getenv("JWT_KEY")
 	var dbinfo = DbInfo{
 		Host:     os.Getenv("SERVER_DB_HOST"),
 		Port:     os.Getenv("SERVER_DB_PORT"),
@@ -43,16 +47,93 @@ func main() {
 
 func HTTPServer(host string, port string) {
 
-	http.HandleFunc("/", Root)
-	http.HandleFunc("/GetBusScheduling", GetBusScheduling)
-	http.HandleFunc("/GetPassengers", GetPassengers)
-	http.HandleFunc("/GetArrivalTime", GetArrivalTime)
+	http.HandleFunc("/GetBusScheduling", BasicAuth(GetBusScheduling))
+	http.HandleFunc("/GetPassengers", BasicAuth(GetPassengers))
+	http.HandleFunc("/GetArrivalTime", BasicAuth(GetArrivalTime))
+	http.HandleFunc("/SignUp", SignUp)
 
 	l := host + ":" + port
 
-	fmt.Println("\n\nIniciando servidor em ", l, "\n", time.Now())
+	fmt.Println("\n\nIniciando servidor em ", l)
 
 	fmt.Println(http.ListenAndServe(l, nil))
+}
+
+func SignUp(w http.ResponseWriter, r *http.Request) {
+
+	var passenger Passenger
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		fmt.Fprintf(w, `{"Eror": "Internal server error"}`)
+		return
+	}
+
+	err = json.Unmarshal(body, &passenger)
+
+	if err != nil {
+		fmt.Println("Error unmarshaling the body: ", err)
+		fmt.Fprintf(w, `{"Eror": "Internal server error"}`)
+		return
+	}
+
+	valid := ValidPassenger(passenger)
+
+	if len(valid) > 0 {
+		fmt.Fprint(w, `{"Error": "`+valid+`"}`)
+		return
+	}
+
+	rawSqlData, err := ioutil.ReadFile("passenger_exists.sql")
+
+	if err != nil {
+		fmt.Println("Error parsing passenger_exists.sql")
+		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	data, err := DB.Queryx(sql, passenger.Username, passenger.Email)
+
+	if err != nil {
+		fmt.Println("Error on query passenger_exists.sql")
+		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		return
+	}
+
+	var p Passenger
+
+	data.StructScan(p)
+
+	if len(p.Email) > 0 {
+		fmt.Fprintf(w, `{"Error": "Username or email already taken"}`)
+		return
+	}
+
+	rawSqlData, err = ioutil.ReadFile("new_user.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file new_user.sql")
+		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		return
+	}
+
+	sql = string(rawSqlData)
+
+	_, err = DB.Exec(sql, passenger)
+
+	if err != nil {
+		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		return
+	}
+
+	fmt.Fprintf(w, "User created")
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+
 }
 
 func GetArrivalTime(w http.ResponseWriter, r *http.Request) {
@@ -241,4 +322,58 @@ func OpenConnection(info DbInfo) (err error) {
 	}
 
 	return
+}
+
+type handler func(w http.ResponseWriter, r *http.Request)
+
+func BasicAuth(pass handler) handler {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+
+		if len(auth) != 2 || auth[0] != "Basic" {
+			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			return
+		}
+
+		payload, _ := base64.StdEncoding.DecodeString(auth[1])
+		pair := strings.SplitN(string(payload), ":", 2)
+
+		if len(pair) != 2 || !validate(pair[0], pair[1]) {
+			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			return
+		}
+
+		pass(w, r)
+	}
+}
+
+func validate(username, password string) bool {
+
+	rawsql, err := ioutil.ReadFile("./sql/auth.sql")
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	passengers, err := DB.Queryx(string(rawsql), username, password)
+
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	var p Passenger
+
+	for passengers.Next() {
+		passengers.StructScan(&p)
+	}
+
+	if len(p.Username) != 0 {
+		return true
+	}
+
+	return false
 }

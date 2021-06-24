@@ -2,11 +2,10 @@ DROP TABLE IF EXISTS passenger, post, comment, bus, line_bus, line, station, sta
 
 CREATE TABLE passenger(
   id_passenger SERIAL UNIQUE PRIMARY KEY,
-  nome VARCHAR(60),
-  email VARCHAR(60),
-  password VARCHAR(60),
-  role_type VARCHAR(10),
-  scholarity VARCHAR(24) NOT NULL
+  username VARCHAR(60) UNIQUE NOT NULL,
+  email VARCHAR(60) UNIQUE NOT NULL,
+  password VARCHAR(60) UNIQUE NOT NULL,
+  role_type VARCHAR(10)
 );
 
 CREATE TABLE line (
@@ -66,3 +65,4 @@ INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (1, 1, '14:30:00')
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (2, 1, '9:20:00');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (3, 1, '16:10:00');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (4, 1, '23:50:00');
+INSERT INTO passenger(username, password, email, role_type) VALUES ('teste', 'teste123', 'teste@teste.com', 'user');
