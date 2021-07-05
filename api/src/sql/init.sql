@@ -19,16 +19,11 @@ CREATE TABLE bus(
     passenger_count INT NOT NULL
 );
 
-CREATE TABLE post(
-    id_post SERIAL UNIQUE PRIMARY KEY,
-    id_bus INT NOT NULL REFERENCES bus (id_bus)
-);
-
 CREATE TABLE comment(
     id_comment SERIAL UNIQUE PRIMARY KEY,
-    id_post INT NOT NULL REFERENCES post (id_post) ON DELETE CASCADE,
+    id_bus INT NOT NULL REFERENCES bus (id_bus) ON DELETE CASCADE,
     id_passenger INT NOT NULL REFERENCES passenger (id_passenger),
-    created_at DATE NOT NULL,
+    created_at DATE DEFAULT now(),
     content VARCHAR(200)
 );
 

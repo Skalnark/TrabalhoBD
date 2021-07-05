@@ -74,3 +74,11 @@ type DbInfo struct {
 	Port     string
 	Host     string
 }
+
+type Comment struct {
+	IdComment   string  `json:"id_comment" db:"id_comment"`
+	IdBus 		string 	`json:"id_bus" db:"id_bus"`
+	IdPassenger string  `json:"id_passenger" db:"id_passenger"`
+	CreatedAt 	string	`json:"created_at" db:"created_at"`
+	Content 	string 	`json:"content" db:"content"`
+}

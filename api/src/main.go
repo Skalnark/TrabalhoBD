@@ -51,6 +51,8 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetPassengers", BasicAuth(GetPassengers))
 	http.HandleFunc("/GetArrivalTime", BasicAuth(GetArrivalTime))
 	http.HandleFunc("/SignUp", SignUp)
+	http.HandleFunc("/CreateComment", BasicAuth(CreateComment))
+	http.HandleFunc("/GetComments", BasicAuth(GetComments))
 
 	l := host + ":" + port
 
@@ -290,34 +292,70 @@ func Root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Haro warudo")
 }
 
-func OpenConnection(info DbInfo) (err error) {
+func CreateComment(w http.ResponseWriter, r *http.Request) {
 
-	var port = 0
+  body, err := ioutil.ReadAll(r.Body)
 
-	port, err = strconv.Atoi(info.Port)
-	var SQLInfo = fmt.Sprintf(
-		"host=%s port=%d user=%s "+
-			"password=%s dbname=%s sslmode=disable",
-		info.Host, port, info.Username, info.Password, info.Name)
+  if err != nil {
+	  fmt.Println("Error reading the body", err)
+	  return
+  }
+  
+  var comment Comment
 
-	fmt.Println(SQLInfo)
+  err = json.Unmarshal(body, &comment)
 
-	DB, err = sqlx.Open("postgres", SQLInfo)
+  if err != nil {
+	  fmt.Println("Error unmarshaling the body: ", err)
+	  return
+  }
+
+  rawSqlData, err := ioutil.ReadFile("./sql/comment.sql")
+
+  if err != nil {
+	  fmt.Println("Error opening comment.sql: ", err)
+	  return
+  }
+
+  sql := string(rawSqlData)
+
+  _, err = DB.Queryx(sql, comment.IdBus, comment.IdPassenger, comment.Content)
+
+  if err != nil {
+	  fmt.Println("Error inserting data: ", err)
+	  return
+  }
+}
+
+func GetComments(w http.ResponseWriter, r *http.Request) {
+	busParameter := r.URL.Query().Get("bus")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_comments.sql")
 
 	if err != nil {
-		fmt.Println("(", info.Name, ") error connecting to the server")
+		fmt.Println("Error reading file get_comments.sql", err)
 		return
 	}
 
-	err = DB.Ping()
+	sql := string(rawSqlData)
+
+	comments := []Comment{}
+	
+	err = DB.Select(&comments, sql, busParameter)
 
 	if err != nil {
-		fmt.Println("(", info.Name, ") ping error")
-	} else {
-		fmt.Println("Conected to the database: ", info.Name)
+		fmt.Println("Error on query: ", err)
+		return
+	}
+	
+	commentsJson, err := json.Marshal(comments)
+
+	if err != nil {
+		fmt.Println("Error marshaling: ", err)
+		return
 	}
 
-	return
+	fmt.Fprintf(w, string(commentsJson))
 }
 
 type handler func(w http.ResponseWriter, r *http.Request)
@@ -372,4 +410,34 @@ func validate(username, password string) bool {
 	}
 
 	return false
+}
+
+func OpenConnection(info DbInfo) (err error) {
+
+	var port = 0
+
+	port, err = strconv.Atoi(info.Port)
+	var SQLInfo = fmt.Sprintf(
+		"host=%s port=%d user=%s "+
+			"password=%s dbname=%s sslmode=disable",
+		info.Host, port, info.Username, info.Password, info.Name)
+
+	fmt.Println(SQLInfo)
+
+	DB, err = sqlx.Open("postgres", SQLInfo)
+
+	if err != nil {
+		fmt.Println("(", info.Name, ") error connecting to the server")
+		return
+	}
+
+	err = DB.Ping()
+
+	if err != nil {
+		fmt.Println("(", info.Name, ") ping error")
+	} else {
+		fmt.Println("Conected to the database: ", info.Name)
+	}
+
+	return
 }

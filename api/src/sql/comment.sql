@@ -1,0 +1,1 @@
+INSERT INTO comment(id_bus, id_passenger, content) VALUES ($1, $2, $3);

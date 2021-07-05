@@ -1,0 +1,1 @@
+SELECT * FROM comment WHERE id_bus = $1;
