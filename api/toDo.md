@@ -2,6 +2,6 @@
 
 2 - get linha by ponto_id
 
-3 - get all onibus by ponto de onibus
+3 - get all onibus by ponto de onibus [x]
 
-4 - get all onibus my linha_id
+4 - get all onibus by linha_id [x]

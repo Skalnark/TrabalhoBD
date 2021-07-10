@@ -9,12 +9,12 @@ CREATE TABLE passenger(
 );
 
 CREATE TABLE line (
-    code INT PRIMARY KEY
+    code VARCHAR(10) PRIMARY KEY
 );
 
 CREATE TABLE bus(
     id_bus SERIAL UNIQUE PRIMARY KEY,
-    line_code INT REFERENCES line (code),
+    line_code VARCHAR(10) REFERENCES line (code),
     departure_time TIME NOT NULL,
     passenger_count INT NOT NULL
 );
@@ -44,20 +44,41 @@ CREATE TABLE station_bus (
 CREATE TABLE station_line (
     id_station_line SERIAL UNIQUE PRIMARY KEY,
     id_station INT NOT NULL REFERENCES station (id_station) ON DELETE CASCADE,
-    line_code INT NOT NULL REFERENCES line (code) ON DELETE CASCADE
+    line_code VARCHAR(10) NOT NULL REFERENCES line (code) ON DELETE CASCADE
 );
 
-INSERT INTO line(code) VALUES (2303);
-INSERT INTO line(code) VALUES (2307);
-INSERT INTO line(code) VALUES (3203);
-INSERT INTO line(code) VALUES (3207);
-INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (2303, '7:23:00', 60);
-INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (2307, '8:28:00', 60);
-INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (3203, '12:20:00', 32);
-INSERT INTO bus(line_code, departure_time, passenger_count) VALUES (3207, '00:32:00', 30);
+INSERT INTO line(code) VALUES ('2303');
+INSERT INTO line(code) VALUES ('2307');
+INSERT INTO line(code) VALUES ('3203');
+INSERT INTO line(code) VALUES ('3207');
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2303', '07:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2303', '08:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2303', '09:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2303', '10:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2303', '11:23:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '08:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '12:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '13:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '14:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '15:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('2307', '16:28:00', 60);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3203', '17:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3203', '18:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3203', '19:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3203', '20:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3203', '21:20:00', 32);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3207', '22:32:00', 30);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3207', '23:32:00', 30);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3207', '00:32:00', 30);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3207', '01:32:00', 30);
+INSERT INTO bus(line_code, departure_time, passenger_count) VALUES ('3207', '02:32:00', 30);
 INSERT INTO station(street, district, reference) VALUES ('Rua tal', 'Bairro tal', 'Em frente a tal lugar');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (1, 1, '14:30:00');
-INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (2, 1, '9:20:00');
+INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (2, 1, '09:20:00');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (3, 1, '16:10:00');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (4, 1, '23:50:00');
 INSERT INTO passenger(username, password, email, role_type) VALUES ('teste', 'teste123', 'teste@teste.com', 'user');
+INSERT INTO station_line(id_station, line_code) VALUES (1, '2303');
+INSERT INTO station_line(id_station, line_code) VALUES (1, '2307');
+INSERT INTO station_line(id_station, line_code) VALUES (1, '3203');
+INSERT INTO station_line(id_station, line_code) VALUES (1, '3207');

@@ -53,12 +53,114 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/SignUp", SignUp)
 	http.HandleFunc("/CreateComment", BasicAuth(CreateComment))
 	http.HandleFunc("/GetComments", BasicAuth(GetComments))
+	http.HandleFunc("/GetBusByLine", BasicAuth(GetBusByLine))
+	http.HandleFunc("/GetBusByStation", BasicAuth(GetBusByStation))
 
 	l := host + ":" + port
 
 	fmt.Println("\n\nIniciando servidor em ", l)
 
 	fmt.Println(http.ListenAndServe(l, nil))
+}
+
+func GetBusByStation(w http.ResponseWriter, r *http.Request) {
+	var station StationBus
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		fmt.Println("Error reading the request body: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(body, &station)
+
+	if err != nil {
+		fmt.Println("Error unmarshaling the body: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_bus_by_bus_station.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_bus_by_bus_station.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var busArr []Bus
+
+	err = DB.Select(&busArr, sql, station.IdStation)
+
+	if err != nil {
+		fmt.Println("Error running get_bus_by_bus_station.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	busJson, err := json.Marshal(busArr)
+
+	if err != nil {
+		fmt.Println("Error marshaling the response: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(busJson))
+}
+
+func GetBusByLine(w http.ResponseWriter, r *http.Request) {
+	var line Line
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+		fmt.Println("Error reading the request body: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	err = json.Unmarshal(body, &line)
+
+	if err != nil {
+		fmt.Println("Error unmarshalling the request body: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_bus_by_line.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_bus_by_line.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var busArr []Bus
+
+	err = DB.Select(&busArr, sql, line.Code)
+
+	if err != nil {
+		fmt.Println("Error running get_bus_by_line.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	busJson, err := json.Marshal(busArr)
+
+	if err != nil {
+		fmt.Println("Error marshalling the bus array: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(busJson))
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +193,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("Error parsing passenger_exists.sql: ", err)
-		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -101,7 +203,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("Error on query passenger_exists.sql")
-		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -118,7 +220,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Println("Error reading file new_user.sql: ", err)
-		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -127,7 +229,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	_, err = DB.Exec(sql, passenger.Username, passenger.Password, passenger.Email)
 
 	if err != nil {
-		fmt.Fprintf(w, `{"Error": "Internal server error"}`)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -294,37 +396,37 @@ func Root(w http.ResponseWriter, r *http.Request) {
 
 func CreateComment(w http.ResponseWriter, r *http.Request) {
 
-  body, err := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(r.Body)
 
-  if err != nil {
-	  fmt.Println("Error reading the body", err)
-	  return
-  }
-  
-  var comment Comment
+	if err != nil {
+		fmt.Println("Error reading the body", err)
+		return
+	}
 
-  err = json.Unmarshal(body, &comment)
+	var comment Comment
 
-  if err != nil {
-	  fmt.Println("Error unmarshaling the body: ", err)
-	  return
-  }
+	err = json.Unmarshal(body, &comment)
 
-  rawSqlData, err := ioutil.ReadFile("./sql/comment.sql")
+	if err != nil {
+		fmt.Println("Error unmarshaling the body: ", err)
+		return
+	}
 
-  if err != nil {
-	  fmt.Println("Error opening comment.sql: ", err)
-	  return
-  }
+	rawSqlData, err := ioutil.ReadFile("./sql/comment.sql")
 
-  sql := string(rawSqlData)
+	if err != nil {
+		fmt.Println("Error opening comment.sql: ", err)
+		return
+	}
 
-  _, err = DB.Queryx(sql, comment.IdBus, comment.IdPassenger, comment.Content)
+	sql := string(rawSqlData)
 
-  if err != nil {
-	  fmt.Println("Error inserting data: ", err)
-	  return
-  }
+	_, err = DB.Queryx(sql, comment.IdBus, comment.IdPassenger, comment.Content)
+
+	if err != nil {
+		fmt.Println("Error inserting data: ", err)
+		return
+	}
 }
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
@@ -340,14 +442,14 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 	sql := string(rawSqlData)
 
 	comments := []Comment{}
-	
+
 	err = DB.Select(&comments, sql, busParameter)
 
 	if err != nil {
 		fmt.Println("Error on query: ", err)
 		return
 	}
-	
+
 	commentsJson, err := json.Marshal(comments)
 
 	if err != nil {
@@ -368,6 +470,7 @@ func BasicAuth(pass handler) handler {
 
 		if len(auth) != 2 || auth[0] != "Basic" {
 			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
@@ -376,6 +479,7 @@ func BasicAuth(pass handler) handler {
 
 		if len(pair) != 2 || !validate(pair[0], pair[1]) {
 			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 

@@ -41,7 +41,7 @@ func ValidPassenger(p Passenger) string {
 type Passenger struct {
 	Id         string `json:"id_passenger" db:"id_passenger"`
 	Username   string `json:"username" db:"username"`
-	Email      string `json:"email", db:"email"`
+	Email      string `json:"email" db:"email"`
 	Password   string `json:"password" db:"password"`
 	RoleType   string `json:"role_type" db:"role_type"`
 	Scholarity string `json:"scholarity" db:"scholarity"`
@@ -54,10 +54,14 @@ type LineBus struct {
 }
 
 type Bus struct {
-	IdBus          string `json:"id_bus" db:"id_bus`
-	LineNumber     string `json:"line_number" db:"line_number"`
+	IdBus          string `json:"id_bus" db:"id_bus"`
+	LineCode       string `json:"line_code" db:"line_code"`
 	DepartureTime  string `json:"departure_time" db:"departure_time"`
-	PassengerCount string `json:"passenger_count", db:"passenger_count"`
+	PassengerCount string `json:"passenger_count" db:"passenger_count"`
+}
+
+type Line struct {
+	Code string `json:"code" db:"code"`
 }
 
 type StationBus struct {
@@ -76,9 +80,9 @@ type DbInfo struct {
 }
 
 type Comment struct {
-	IdComment   string  `json:"id_comment" db:"id_comment"`
-	IdBus 		string 	`json:"id_bus" db:"id_bus"`
-	IdPassenger string  `json:"id_passenger" db:"id_passenger"`
-	CreatedAt 	string	`json:"created_at" db:"created_at"`
-	Content 	string 	`json:"content" db:"content"`
+	IdComment   string `json:"id_comment" db:"id_comment"`
+	IdBus       string `json:"id_bus" db:"id_bus"`
+	IdPassenger string `json:"id_passenger" db:"id_passenger"`
+	CreatedAt   string `json:"created_at" db:"created_at"`
+	Content     string `json:"content" db:"content"`
 }
