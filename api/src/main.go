@@ -55,12 +55,36 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetComments", BasicAuth(GetComments))
 	http.HandleFunc("/GetBusByLine", BasicAuth(GetBusByLine))
 	http.HandleFunc("/GetBusByStation", BasicAuth(GetBusByStation))
+	http.HandleFunc("/GetLineByStation", BasicAuth(GetLineByStation))
 
 	l := host + ":" + port
 
 	fmt.Println("\n\nIniciando servidor em ", l)
 
 	fmt.Println(http.ListenAndServe(l, nil))
+}
+
+func GetLineByStation(w http.ResponseWriter, r *http.Request) {
+
+	IdStation := r.URL.Query().Get("IdStation")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_line_by_station.sql")
+
+	sql := string(rawSqlData)
+
+	var lines []Line
+
+	err = DB.Select(&lines, sql, IdStation)
+
+	lineJson, err := json.Marshal(lines)
+
+	if err != nil {
+		fmt.Println("Error marshalling the line array: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(lineJson))
 }
 
 func GetBusByStation(w http.ResponseWriter, r *http.Request) {
@@ -470,7 +494,6 @@ func BasicAuth(pass handler) handler {
 
 		if len(auth) != 2 || auth[0] != "Basic" {
 			http.Error(w, "authorization failed", http.StatusUnauthorized)
-			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
@@ -479,7 +502,6 @@ func BasicAuth(pass handler) handler {
 
 		if len(pair) != 2 || !validate(pair[0], pair[1]) {
 			http.Error(w, "authorization failed", http.StatusUnauthorized)
-			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
