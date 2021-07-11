@@ -324,6 +324,92 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "http://localhost:3000/GetBusByLine",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "teste",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "teste123",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"code\": \"2303\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/GetBusByLine",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"GetBusByLine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetBusByStation",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "teste",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "teste123",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id_station\": \"1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/GetBusByStation",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"GetBusByStation"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
