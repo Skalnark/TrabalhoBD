@@ -56,12 +56,46 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetBusByLine", BasicAuth(GetBusByLine))
 	http.HandleFunc("/GetBusByStation", BasicAuth(GetBusByStation))
 	http.HandleFunc("/GetLineByStation", BasicAuth(GetLineByStation))
+	http.HandleFunc("/GetAllBus", BasicAuth(GetAllBus))
 
 	l := host + ":" + port
 
 	fmt.Println("\n\nIniciando servidor em ", l)
 
 	fmt.Println(http.ListenAndServe(l, nil))
+}
+
+func GetAllBus(w http.ResponseWriter, r *http.Request) {
+	
+	rawSqlData, err := ioutil.ReadFile("./sql/get_all_bus.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_all_bus.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var busArr []Bus
+
+	err = DB.Select(&busArr, sql)
+
+	if err != nil {
+		fmt.Println("Error running query get_all_bus.sql")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	busJson, err := json.Marshal(busArr)
+
+	if err != nil {
+		fmt.Println("Error marshaling the response: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(busJson))
 }
 
 func GetLineByStation(w http.ResponseWriter, r *http.Request) {

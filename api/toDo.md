@@ -1,4 +1,4 @@
-1 - get all para todos os pontos de onibus com todas as info da tabela
+1 - get all para todos os pontos de onibus com todas as info da tabela [x]
 
 2 - get linha by ponto_id [x]
 
