@@ -20,7 +20,7 @@ import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
 
-import logo from "assets/img/reactlogo.png";
+import logo from "assets/img/onibus.png";
 
 function Sidebar({ color, image, routes }) {
   const location = useLocation();
@@ -43,13 +43,13 @@ function Sidebar({ color, image, routes }) {
           >
             <div className="logo-img">
               <img
-                src={require("assets/img/reactlogo.png").default}
+                src={require("assets/img/onibus.png").default}
                 alt="..."
               />
             </div>
           </a>
-          <a className="simple-text" href="http://www.creative-tim.com">
-            Creative Tim
+          <a className="simple-text" href="/inicio">
+            Transporte Fácil
           </a>
         </div>
         <Nav>

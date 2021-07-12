@@ -15,39 +15,29 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.js";
+import Home from "views/Home.js";
 import UserProfile from "views/UserProfile.js";
 import TableList from "views/TableList.js";
 import Typography from "views/Typography.js";
 import Icons from "views/Icons.js";
-import Maps from "views/Maps.js";
-import Notifications from "views/Notifications.js";
-import Upgrade from "views/Upgrade.js";
 
 const dashboardRoutes = [
   {
-    upgrade: true,
-    path: "/upgrade",
-    name: "Upgrade to PRO",
-    icon: "nc-icon nc-alien-33",
-    component: Upgrade
-  },
-  {
-    path: "/dashboard",
-    name: "Dashboared",
+    path: "/inicio",
+    name: "Início",
     icon: "nc-icon nc-chart-pie-35",
-    component: Dashboard
+    component: Home
   },
   {
-    path: "/user",
-    name: "User Profile",
-    icon: "nc-icon nc-circle-09",
+    path: "/onibus",
+    name: "Procurar ônibus",
+    icon: "nc-icon nc-bus-front-12",
     component: UserProfile,
   },
   {
     path: "/table",
-    name: "Table List",
-    icon: "nc-icon nc-notes",
+    name: "Linhas",
+    icon: "nc-icon nc-bullet-list-67",
     component: TableList,
   },
   {
@@ -61,19 +51,7 @@ const dashboardRoutes = [
     name: "Icons",
     icon: "nc-icon nc-atom",
     component: Icons
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "nc-icon nc-pin-3",
-    component: Maps
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: "nc-icon nc-bell-55",
-    component: Notifications
-  },
+  }
 ];
 
 export default dashboardRoutes;
