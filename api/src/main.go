@@ -57,6 +57,9 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetBusByStation", GetBusByStation)
 	http.HandleFunc("/GetLineByStation", GetLineByStation)
 	http.HandleFunc("/GetAllBus", GetAllBus)
+	http.HandleFunc("/get-all-line", getAllLine)
+	http.HandleFunc("/get-all-station", getAllStation)
+	http.HandleFunc("/get-all-passenger", getAllPassenger)
 
 	l := host + ":" + port
 
@@ -73,7 +76,7 @@ func GetAllBus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
-	
+
 	rawSqlData, err := ioutil.ReadFile("./sql/get_all_bus.sql")
 
 	if err != nil {
@@ -103,6 +106,126 @@ func GetAllBus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, string(busJson))
+}
+
+func getAllLine(w http.ResponseWriter, r *http.Request) {
+
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_all_line.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_all_line.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var arr []Line
+
+	err = DB.Select(&arr, sql)
+
+	if err != nil {
+		fmt.Println("Error running query get_all_line.sql")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resultJson, err := json.Marshal(arr)
+
+	if err != nil {
+		fmt.Println("Error marshaling the response: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(resultJson))
+}
+
+func getAllStation(w http.ResponseWriter, r *http.Request) {
+
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_all_station.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_all_station.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var arr []Station
+
+	err = DB.Select(&arr, sql)
+
+	if err != nil {
+		fmt.Println("Error running query get_all_station.sql")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resultJson, err := json.Marshal(arr)
+
+	if err != nil {
+		fmt.Println("Error marshaling the response: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(resultJson))
+}
+
+func getAllPassenger(w http.ResponseWriter, r *http.Request) {
+
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_all_passenger.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file get_all_passenger.sql: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var arr []Passenger
+
+	err = DB.Select(&arr, sql)
+
+	if err != nil {
+		fmt.Println("Error running query get_all_passenger.sql")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resultJson, err := json.Marshal(arr)
+
+	if err != nil {
+		fmt.Println("Error marshaling the response: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(resultJson))
 }
 
 func GetLineByStation(w http.ResponseWriter, r *http.Request) {
@@ -533,7 +656,6 @@ func GetComments(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
-
 
 	busParameter := r.URL.Query().Get("bus")
 

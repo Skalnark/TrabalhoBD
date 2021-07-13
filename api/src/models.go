@@ -64,6 +64,13 @@ type Line struct {
 	Code string `json:"code" db:"code"`
 }
 
+type Station struct {
+	Id        string `json:"id" db:"id_station"`
+	Street    string `json:"street" db:"street"`
+	District  string `json:"district" db:"district"`
+	Reference string `json:"reference" db:"reference"`
+}
+
 type StationBus struct {
 	Id        string `json:"id" db:"id_station_bus"`
 	IdBus     string `json:"id_bus" db:"id_bus"`
