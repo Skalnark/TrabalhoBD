@@ -1,22 +1,42 @@
-import React from "react";
-import ChartistGraph from "react-chartist";
+import React, { useEffect } from "react";
 // react-bootstrap components
 import {
-  Badge,
-  Button,
   Card,
-  Navbar,
-  Nav,
-  Table,
   Container,
   Row,
   Col,
-  Form,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
+import { useHistory } from "react-router";
+import { withSnackbar } from "notistack";
 
-function Home() {
+import CommonService from "services/CommonService";
+
+function Home(props) {
+  var history = useHistory();
+
+  const service = new CommonService("/GetAllBus")
+
+  useEffect(() => {
+    console.log("bomdia");
+
+    service.getAll().then((res) => {
+      console.log(res)
+    }).catch((error) => {
+      callSnackBar("Erro ao acessar API", "error");
+      console.log(error);
+    });
+  }, []);
+
+  function callSnackBar(message, variant = "Default") {
+		props.enqueueSnackbar(message, {
+			variant: variant,
+			anchorOrigin: {
+				vertical: "bottom",
+				horizontal: "right",
+			},
+		});
+	}
+
   return (
     <>
       <Container fluid>
@@ -131,4 +151,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default withSnackbar(Home);

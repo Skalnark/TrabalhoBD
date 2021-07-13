@@ -70,7 +70,7 @@ function Admin() {
 					<div className="content">
 						<Switch>
 							{getRoutes(routes)}
-							<Redirect from="/" to="/dashboard" />
+							<Redirect from="/" to="/inicio" />
 						</Switch>
 					</div>
 					<Footer />

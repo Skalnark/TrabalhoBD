@@ -52,7 +52,7 @@ function LoginIndex(props) {
 
 	useEffect(() => {
 		if (isAuthenticated()) {
-			props.history.push("/dashboard");
+			props.history.push("/inicio");
 		}
 	});
 

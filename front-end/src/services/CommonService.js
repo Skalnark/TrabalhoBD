@@ -1,5 +1,6 @@
 import { environment } from '../environments/environments';
 import ApiService from './ApiService';
+import { getAuth } from './AuthService';
 
 class CommonService {
 
@@ -25,6 +26,10 @@ class CommonService {
 
   getAll() {
     return ApiService.get(this.url);
+  }
+
+  getWithParams(params) {
+    return ApiService.get(this.url + "?" + params);
   }
 
   getById(id) {
