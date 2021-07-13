@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 // react-bootstrap components
 import {
   Card,
@@ -16,11 +16,13 @@ function Home(props) {
 
   const service = new CommonService("/GetAllBus")
 
+  const [busList, setBusList] = useState(undefined);
+
   useEffect(() => {
     console.log("bomdia");
 
     service.getAll().then((res) => {
-      console.log(res)
+      setBusList(res.data);
     }).catch((error) => {
       callSnackBar("Erro ao acessar API", "error");
       console.log(error);
@@ -47,13 +49,13 @@ function Home(props) {
                 <Row>
                   <Col xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-chart text-warning"></i>
+                      <i className="nc-icon nc-bus-front-12 text-primary"></i>
                     </div>
                   </Col>
                   <Col xs="7">
                     <div className="numbers">
-                      <p className="card-category">Number</p>
-                      <Card.Title as="h4">150GB</Card.Title>
+                      <p className="card-category">Ônibus</p>
+                      <Card.Title as="h4">{busList !== undefined ? busList.length : 0}</Card.Title>
                     </div>
                   </Col>
                 </Row>
@@ -61,8 +63,7 @@ function Home(props) {
               <Card.Footer>
                 <hr></hr>
                 <div className="stats">
-                  <i className="fas fa-redo mr-1"></i>
-                  Update Now
+                  Número de ônibus em circulação
                 </div>
               </Card.Footer>
             </Card>

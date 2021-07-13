@@ -27,6 +27,7 @@ class CommonService {
   getAll() {
     return ApiService.get(this.url);
   }
+  
 
   getWithParams(params) {
     return ApiService.get(this.url + "?" + params);
