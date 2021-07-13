@@ -47,16 +47,16 @@ func main() {
 
 func HTTPServer(host string, port string) {
 
-	http.HandleFunc("/GetBusScheduling", BasicAuth(GetBusScheduling))
-	http.HandleFunc("/GetPassengers", BasicAuth(GetPassengers))
-	http.HandleFunc("/GetArrivalTime", BasicAuth(GetArrivalTime))
+	http.HandleFunc("/GetBusScheduling", GetBusScheduling)
+	http.HandleFunc("/GetPassengers", GetPassengers)
+	http.HandleFunc("/GetArrivalTime", GetArrivalTime)
 	http.HandleFunc("/SignUp", SignUp)
 	http.HandleFunc("/CreateComment", BasicAuth(CreateComment))
-	http.HandleFunc("/GetComments", BasicAuth(GetComments))
-	http.HandleFunc("/GetBusByLine", BasicAuth(GetBusByLine))
-	http.HandleFunc("/GetBusByStation", BasicAuth(GetBusByStation))
-	http.HandleFunc("/GetLineByStation", BasicAuth(GetLineByStation))
-	http.HandleFunc("/GetAllBus", BasicAuth(GetAllBus))
+	http.HandleFunc("/GetComments", GetComments)
+	http.HandleFunc("/GetBusByLine", GetBusByLine)
+	http.HandleFunc("/GetBusByStation", GetBusByStation)
+	http.HandleFunc("/GetLineByStation", GetLineByStation)
+	http.HandleFunc("/GetAllBus", GetAllBus)
 
 	l := host + ":" + port
 
@@ -66,6 +66,13 @@ func HTTPServer(host string, port string) {
 }
 
 func GetAllBus(w http.ResponseWriter, r *http.Request) {
+
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 	
 	rawSqlData, err := ioutil.ReadFile("./sql/get_all_bus.sql")
 
@@ -99,6 +106,12 @@ func GetAllBus(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetLineByStation(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 	IdStation := r.URL.Query().Get("IdStation")
 
@@ -122,6 +135,13 @@ func GetLineByStation(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBusByStation(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
 	var station StationBus
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -172,6 +192,13 @@ func GetBusByStation(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBusByLine(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
 	var line Line
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -295,6 +322,12 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetArrivalTime(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 	strBusParameter := r.URL.Query().Get("id_bus")
 	busParameter, err := strconv.Atoi(strBusParameter)
@@ -378,6 +411,12 @@ func GetArrivalTime(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPassengers(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 	busParameter := r.URL.Query().Get("bus")
 
@@ -488,6 +527,14 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
+
 	busParameter := r.URL.Query().Get("bus")
 
 	rawSqlData, err := ioutil.ReadFile("./sql/get_comments.sql")
@@ -523,6 +570,13 @@ type handler func(w http.ResponseWriter, r *http.Request)
 func BasicAuth(pass handler) handler {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+		w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 

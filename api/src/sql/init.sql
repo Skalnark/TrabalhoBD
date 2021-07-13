@@ -4,7 +4,7 @@ CREATE TABLE passenger(
   id_passenger SERIAL UNIQUE PRIMARY KEY,
   username VARCHAR(60) UNIQUE NOT NULL,
   email VARCHAR(60) UNIQUE NOT NULL,
-  password VARCHAR(60) UNIQUE NOT NULL,
+  password VARCHAR(60) NOT NULL,
   role_type VARCHAR(10)
 );
 
