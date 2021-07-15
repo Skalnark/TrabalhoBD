@@ -13,34 +13,54 @@ function useQuery() {
 	return new URLSearchParams(useLocation().search);
 }
 
-function PaginaOnibus() {
+function PaginaOnibus(props) {
 	const busService = new CommonService("/GetAllBus");
-   let query = useQuery(); // Objeto com os parametros
-   
-   var history = useHistory();
+	const getCommentsService = new CommonService("/GetComments");
+	let query = useQuery(); // Objeto com os parametros
+
+	var history = useHistory();
 
 	const [thatOneBus, setThatOneBus] = useState(undefined);
+	const [thoseComments, setThoseComments] = useState(undefined);
 
 	useEffect(() => {
-      console.log(query.get("idOnibus") + "oxe");
-      
-      if (query.get("idOnibus") == "" || query.get("idOnibus") == undefined || query.get("idOnibus") == null
-      ) {
-         history.push({
-            pathname: "/onibus"
-         })
-      }
+		if (
+			query.get("idOnibus") == "" ||
+			query.get("idOnibus") == undefined ||
+			query.get("idOnibus") == null
+		) {
+			history.push({
+				pathname: "/onibus",
+			});
+		}
+
+		var idOnibus = query.get("idOnibus");
 
 		busService
 			.getAll()
 			.then((res) => {
-				setThatOneBus(res.data[query.get("idOnibus")]);
+				setThatOneBus(res.data[idOnibus]);
 			})
 			.catch((error) => {
 				callSnackBar("Erro ao acessar API", "error");
 				console.log(error);
 			});
+
+		getCommentsService.getWithParams("bus=" + idOnibus).then((commentRes) => {
+			console.log(commentRes.data);
+			setThoseComments(commentRes.data);
+		});
 	}, []);
+
+	function callSnackBar(message, variant = "Default") {
+		props.enqueueSnackbar(message, {
+			variant: variant,
+			anchorOrigin: {
+				vertical: "bottom",
+				horizontal: "right",
+			},
+		});
+	}
 
 	return (
 		<>
@@ -126,137 +146,65 @@ function PaginaOnibus() {
 							</Card>
 						</Col>
 						<Col md="7">
-							<Card>
-								<Card.Header>
-									<Card.Title as="h4">Edit Profile</Card.Title>
-								</Card.Header>
-								<Card.Body>
-									<Form>
-										<Row>
-											<Col className="pr-1" md="5">
-												<Form.Group>
-													<label>Company (disabled)</label>
-													<Form.Control
-														defaultValue="Creative Code Inc."
-														disabled
-														placeholder="Company"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-											<Col className="px-1" md="3">
-												<Form.Group>
-													<label>Username</label>
-													<Form.Control
-														defaultValue="michael23"
-														placeholder="Username"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-											<Col className="pl-1" md="4">
-												<Form.Group>
-													<label htmlFor="exampleInputEmail1">
-														Email address
-													</label>
-													<Form.Control
-														placeholder="Email"
-														type="email"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-										</Row>
-										<Row>
-											<Col className="pr-1" md="6">
-												<Form.Group>
-													<label>First Name</label>
-													<Form.Control
-														defaultValue="Mike"
-														placeholder="Company"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-											<Col className="pl-1" md="6">
-												<Form.Group>
-													<label>Last Name</label>
-													<Form.Control
-														defaultValue="Andrew"
-														placeholder="Last Name"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-										</Row>
-										<Row>
-											<Col md="12">
-												<Form.Group>
-													<label>Address</label>
-													<Form.Control
-														defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-														placeholder="Home Address"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-										</Row>
-										<Row>
-											<Col className="pr-1" md="4">
-												<Form.Group>
-													<label>City</label>
-													<Form.Control
-														defaultValue="Mike"
-														placeholder="City"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-											<Col className="px-1" md="4">
-												<Form.Group>
-													<label>Country</label>
-													<Form.Control
-														defaultValue="Andrew"
-														placeholder="Country"
-														type="text"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-											<Col className="pl-1" md="4">
-												<Form.Group>
-													<label>Postal Code</label>
-													<Form.Control
-														placeholder="ZIP Code"
-														type="number"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-										</Row>
-										<Row>
-											<Col md="12">
-												<Form.Group>
-													<label>About Me</label>
-													<Form.Control
-														cols="80"
-														defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                          that two seat Lambo."
-														placeholder="Here can be your description"
-														rows="4"
-														as="textarea"
-													></Form.Control>
-												</Form.Group>
-											</Col>
-										</Row>
-										<Button
-											className="btn-fill pull-right"
-											type="submit"
-											variant="info"
-										>
-											Update Profile
-										</Button>
-										<div className="clearfix"></div>
-									</Form>
-								</Card.Body>
-							</Card>
+							<Row>
+								<Col md="12">
+									<Card>
+										<Card.Body>
+											<Form>
+												<Row>
+													<Col md="12">
+														<Form.Group>
+															<label>Comentário</label>
+															<Form.Control
+																cols="80"
+																placeholder="Digite o seu comentário"
+																rows="4"
+																as="textarea"
+															></Form.Control>
+														</Form.Group>
+													</Col>
+												</Row>
+												<Button
+													className="btn-fill pull-right"
+													type="submit"
+													variant="info"
+												>
+													Comentar
+												</Button>
+												<div className="clearfix"></div>
+											</Form>
+										</Card.Body>
+									</Card>
+								</Col>
+								<Col md="12">
+									<h4>Comentários</h4>
+								</Col>
+								{thoseComments !== undefined ? thoseComments.map(comment => {
+									return (
+										<Col md="12">
+									<Card>
+										<Card.Body>
+											<Row>
+												<Col md="12">
+													<strong>Nathan Rodrigo</strong><p>disse:</p>
+													<p>
+														{comment.content}
+													</p>
+												</Col>
+											</Row>
+											<div className="clearfix"></div>
+										</Card.Body>
+										<Card.Footer>
+											<Row>
+												<Col md="12"><label style={{fontSize: 14}}>22/04/2021</label></Col>
+											</Row>
+										</Card.Footer>
+									</Card>
+								</Col>
+									)
+								}) : null}
+								
+							</Row>
 						</Col>
 					</Row>
 				</Container>
