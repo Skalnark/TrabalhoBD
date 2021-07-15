@@ -92,4 +92,5 @@ type Comment struct {
 	IdPassenger string `json:"id_passenger" db:"id_passenger"`
 	CreatedAt   string `json:"created_at" db:"created_at"`
 	Content     string `json:"content" db:"content"`
+	Username    string `json:"username" db:"username"`
 }

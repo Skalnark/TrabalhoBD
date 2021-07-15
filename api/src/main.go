@@ -51,8 +51,9 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetPassengers", GetPassengers)
 	http.HandleFunc("/GetArrivalTime", GetArrivalTime)
 	http.HandleFunc("/SignUp", SignUp)
-	http.HandleFunc("/CreateComment", BasicAuth(CreateComment))
+	http.HandleFunc("/CreateComment", CreateComment)
 	http.HandleFunc("/GetComments", GetComments)
+	http.HandleFunc("/get-bus-by-id", GetBusById)
 	http.HandleFunc("/GetBusByLine", GetBusByLine)
 	http.HandleFunc("/GetBusByStation", GetBusByStation)
 	http.HandleFunc("/GetLineByStation", GetLineByStation)
@@ -371,7 +372,48 @@ func GetBusByLine(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(busJson))
 }
 
+func GetBusById(w http.ResponseWriter, r *http.Request) {
+
+	idBus := r.URL.Query().Get("bus")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_bus_by_id.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	sql := string(rawSqlData)
+
+	var bus Bus
+
+	err = DB.Get(&bus, sql, idBus)
+
+	if err != nil {
+		fmt.Println("Error running query", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	busJson, err := json.Marshal(bus)
+
+	if err != nil {
+		fmt.Println("Error marshaling json", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(busJson))
+}
+
 func SignUp(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 	var passenger Passenger
 
@@ -577,6 +619,12 @@ func GetPassengers(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBusScheduling(w http.ResponseWriter, r *http.Request) {
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
 
 	lineBus := LineBus{IdBus: r.URL.Query().Get("bus"), IdLine: r.URL.Query().Get("line")}
 
@@ -615,6 +663,15 @@ func Root(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateComment(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Começo da func.")
+	allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
+	w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+
+	fmt.Println("Abaixo dos allow.")
 
 	body, err := ioutil.ReadAll(r.Body)
 
@@ -647,6 +704,7 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error inserting data: ", err)
 		return
 	}
+	fmt.Println("Comentario feito.")
 }
 
 func GetComments(w http.ResponseWriter, r *http.Request) {
@@ -692,6 +750,7 @@ type handler func(w http.ResponseWriter, r *http.Request)
 func BasicAuth(pass handler) handler {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("COmeço do retorno do auth.")
 
 		allowedHeaders := "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token"
 
@@ -699,13 +758,16 @@ func BasicAuth(pass handler) handler {
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", allowedHeaders)
 		w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+		fmt.Println("Abaixo dos allow do retorno do auth.")
 
 		auth := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
 
 		if len(auth) != 2 || auth[0] != "Basic" {
-			http.Error(w, "authorization failed", http.StatusUnauthorized)
+			http.Error(w, "authorization failed", http.StatusBadRequest)
 			return
 		}
+
+		fmt.Println("Meio do retorno do auth.")
 
 		payload, _ := base64.StdEncoding.DecodeString(auth[1])
 		pair := strings.SplitN(string(payload), ":", 2)

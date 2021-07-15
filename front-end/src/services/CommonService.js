@@ -12,9 +12,7 @@ class CommonService {
   }
 
   create(domain) {
-    return ApiService.post(this.url, domain, {
-      auth: getAuth()
-    });
+    return ApiService.post(this.url, domain);
   }
 
   update(domain) {

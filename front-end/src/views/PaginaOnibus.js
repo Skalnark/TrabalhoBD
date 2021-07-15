@@ -82,40 +82,21 @@ function PaginaOnibus(props) {
 
 		let body = {
 			id_bus: idOnibus,
-			id_passenger: "2",
+			id_passenger: "1",
 			content: comentario,
 		};
 
-		var authOptions = {
-			method: "POST",
-			url: "http://localhost:3000/CreateComment",
-			data: qs.stringify(body),
-			headers: {
-				'Authorization': "Basic bmF0aGFuOnNlbmhhMTIz",
-				"Content-Type": "application/x-www-form-urlencoded",
-			},
-			json: true,
-		};
-
-		axios(authOptions)
-			.then(function (response) {
-				console.log(response.data);
-				console.log(response.status);
-			})
-			.catch(function (error) {
-				callSnackBar("Erro ao acessar API", "error");
-				console.log(error);
-			});
-
 		postCommentService
-			.createWithParams(body)
+			.create(body)
 			.then((res) => {
-				setBusList(res.data);
+				callSnackBar("Comentário enviado!", "success");
 			})
 			.catch((error) => {
 				callSnackBar("Erro ao acessar API", "error");
 				console.log(error);
 			});
+
+		history.go(0);
 	}
 
 	function renderDialogo() {

@@ -78,6 +78,11 @@ INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (2, 1, '09:20:00')
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (3, 1, '16:10:00');
 INSERT INTO station_bus(id_bus, id_station, last_seen) VALUES (4, 1, '23:50:00');
 INSERT INTO passenger(username, password, email, role_type) VALUES ('teste', 'teste123', 'teste@teste.com', 'user');
+INSERT INTO passenger(username, password, email, role_type) VALUES ('teste2', 'teste123', 'teste2@teste2.com', 'user');
+INSERT INTO comment(id_bus, id_passenger, content) VALUES (1, 1, 'O ônibus vive atrasando');
+INSERT INTO comment(id_bus, id_passenger, content) VALUES (1, 1, 'Pneu furou e nao vieram trocar');
+INSERT INTO comment(id_bus, id_passenger, content) VALUES (1, 2, 'O motorista ta deixando o povo fumar dentro do onibus');
+INSERT INTO comment(id_bus, id_passenger, content) VALUES (1, 2, 'O cobrador estava armado!');
 INSERT INTO station_line(id_station, line_code) VALUES (1, '2303');
 INSERT INTO station_line(id_station, line_code) VALUES (1, '2307');
 INSERT INTO station_line(id_station, line_code) VALUES (1, '3203');
