@@ -65,6 +65,41 @@ func HTTPServer(host string, port string) {
 	fmt.Println(http.ListenAndServe(l, nil))
 }
 
+func GetBusById(w http.ResponseWriter, r *http.Request) {
+
+	idBus := r.URL.Query().Get("IdBus")
+
+	rawSqlData, err := ioutil.ReadFile("./sql/get_bus_by_id.sql")
+
+	if err != nil {
+		fmt.Println("Error reading file")
+		w.WriteHeader(http.StatusInternalServerError)
+		return	
+	}
+
+	sql := string(rawSqlData)
+
+	var bus Bus
+
+	err = DB.Get(&bus, sql, idBus)
+
+	if err != nil {
+		fmt.Println("Error running query", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	busJson, err := json.Marshal(bus)
+
+	if err != nil {
+		fmt.Println("Error marshaling json", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintf(w, string(busJson)
+}
+
 func GetAllBus(w http.ResponseWriter, r *http.Request) {
 	
 	rawSqlData, err := ioutil.ReadFile("./sql/get_all_bus.sql")
