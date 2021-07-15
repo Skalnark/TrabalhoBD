@@ -13,6 +13,7 @@ import { withRouter } from "react-router-dom";
 import { useEffect } from "react";
 import { withSnackbar } from "notistack";
 import KeyboardBackspaceIcon from "@material-ui/icons/KeyboardBackspace";
+import CadastroDialog from "./CadastroDialog";
 
 function Copyright() {
 	return (
@@ -49,6 +50,12 @@ function LoginIndex(props) {
 
 	const [password, setPassword] = useState("");
 	const [username, setUsername] = useState("");
+
+	const [openCadastro, setOpenCadastro] = useState(false);
+
+	function handleOpenCadastro(value) {
+		setOpenCadastro(value);
+	}
 
 	useEffect(() => {
 		if (isAuthenticated()) {
@@ -91,12 +98,17 @@ function LoginIndex(props) {
 
 	return (
 		<div>
-      <a>
-        <Button onClick={() => props.history.goBack()}>
-          <KeyboardBackspaceIcon />
-        </Button>
-      </a>
+			<a>
+				<Button onClick={() => props.history.goBack()}>
+					<KeyboardBackspaceIcon />
+				</Button>
+			</a>
 			<Container component="main" maxWidth="xs">
+				<CadastroDialog
+					handleCadastroDialog={handleOpenCadastro}
+					openCadastro={openCadastro}
+					actionOnClose={() => handleOpenCadastro(false)}
+				/>
 				<CssBaseline />
 				<div className={classes.paper}>
 					<Avatar className={classes.avatar}>
@@ -147,7 +159,11 @@ function LoginIndex(props) {
 				</div>
 				<Grid container>
 					<Grid item>
-						<Link href="#" variant="body2">
+						<Link
+							href="#"
+							variant="body2"
+							onClick={() => handleOpenCadastro(true)}
+						>
 							{"Não tem uma conta? Cadastre-se"}
 						</Link>
 					</Grid>

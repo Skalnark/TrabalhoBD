@@ -12,8 +12,9 @@ class CommonService {
   }
 
   create(domain) {
-    domain.id= null;
-    return ApiService.post(this.url, domain);
+    return ApiService.post(this.url, domain, {
+      auth: getAuth()
+    });
   }
 
   update(domain) {
@@ -31,6 +32,17 @@ class CommonService {
 
   getWithParams(params) {
     return ApiService.get(this.url + "?" + params);
+  }
+
+  createWithParams(domain) {
+
+
+    return ApiService.post(this.url, domain, {
+      auth: {
+        username: getAuth().username,
+        password: getAuth().password
+      }
+    });
   }
 
   getById(id) {
