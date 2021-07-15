@@ -57,6 +57,7 @@ func HTTPServer(host string, port string) {
 	http.HandleFunc("/GetBusByStation", BasicAuth(GetBusByStation))
 	http.HandleFunc("/GetLineByStation", BasicAuth(GetLineByStation))
 	http.HandleFunc("/GetAllBus", BasicAuth(GetAllBus))
+	http.HandleFunc("/GetBusById", BasicAuth(GetBusById))
 
 	l := host + ":" + port
 
@@ -67,7 +68,7 @@ func HTTPServer(host string, port string) {
 
 func GetBusById(w http.ResponseWriter, r *http.Request) {
 
-	idBus := r.URL.Query().Get("IdBus")
+	idBus := r.URL.Query().Get("bus")
 
 	rawSqlData, err := ioutil.ReadFile("./sql/get_bus_by_id.sql")
 
@@ -97,7 +98,7 @@ func GetBusById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, string(busJson)
+	fmt.Fprintf(w, string(busJson))
 }
 
 func GetAllBus(w http.ResponseWriter, r *http.Request) {
